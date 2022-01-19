@@ -6,5 +6,5 @@
 #/run/numberOfWorkers 4
 /run/initialize
 /gun/particle gamma
-/gun/energy 60 keV
+/gun/energy 6 keV
 /run/beamOn 1000000

@@ -22,7 +22,7 @@ void DataIO::OpenRootFile(){
 		foutTTree->Branch("eventID", &(fmyEvent.eventID), "eventID/I");
 		foutTTree->Branch("trackID", &(fmyEvent.trackID), "trackID/S");
 		foutTTree->Branch("theta",   &(fmyEvent.theta),   "theta/D");
-		foutTTree->Branch("phi",     &(fmyEvent.phi),     "phi/D");
+		foutTTree->Branch("R",     &(fmyEvent.r),     "R/D");
 		foutTTree->Branch("E",       &(fmyEvent.e),       "E/D");
 		foutTTree->Branch("TargetE", &(fmyEvent.targetE), "TargetE/D");
 //	}
@@ -47,12 +47,12 @@ void DataIO::FillTTree(const G4Event* event){
 		fmyEvent.trackID = thisHit->GetTrackID();
 		fmyEvent.e = thisHit->GetEdep();
 		fmyEvent.targetE = thisHit->GetTargetEdep();
-		double zz = thisHit->GetPos().z();
+		double xx = thisHit->GetPos().x();
 		double yy = thisHit->GetPos().y();
-		fmyEvent.theta = zz>0 ? TMath::ATan(yy/zz) : 
-						 yy>0 ? TMath::ATan(yy/zz) + 3.1415926535 :
-						 TMath::ATan(yy/zz) - 3.1415926535;
-		fmyEvent.phi = thisHit->GetPos().angle(G4ThreeVector(1,0,0));
+		fmyEvent.theta = yy>0 ? TMath::ATan(xx/yy) : 
+						 xx>0 ? TMath::ATan(xx/yy) + 3.1415926535 :
+						 TMath::ATan(xx/yy) - 3.1415926535;
+		fmyEvent.r = TMath::Sqrt(xx*xx+yy*yy);
 		foutTTree->Fill();
 	}
 }

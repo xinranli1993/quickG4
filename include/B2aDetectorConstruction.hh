@@ -32,6 +32,7 @@
 
 #include "globals.hh"
 #include "G4VUserDetectorConstruction.hh"
+#include "G4NistManager.hh"
 #include "tls.hh"
 
 class G4VPhysicalVolume;
@@ -86,6 +87,7 @@ class B2aDetectorConstruction : public G4VUserDetectorConstruction
 
     static G4ThreadLocal G4GlobalMagFieldMessenger*  fMagFieldMessenger; 
                                          // magnetic field messenger
+	G4NistManager* nistManager;
     
     G4bool  fCheckOverlaps; // option to activate checking of volumes overlaps 
 };

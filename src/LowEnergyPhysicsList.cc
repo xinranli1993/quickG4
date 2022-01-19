@@ -16,7 +16,7 @@ LowEnergyPhysicsList::LowEnergyPhysicsList()
    fEmPhysics(NULL)
 {
 	// Set the default cut value
-	SetDefaultCutValue(100*um);//DBIO::Get()->GetDefaultCut());
+	SetDefaultCutValue(1*um);//DBIO::Get()->GetDefaultCut());
 
 	SetVerboseLevel(1);
 

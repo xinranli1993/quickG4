@@ -16,7 +16,7 @@ struct myEvent{
 	int eventID;
 	short trackID;
 	double theta; //0-360
-	double phi; //0-90, angle to the forward direction.
+	double r; //hit R on CPD
 	double e; //total energy deposition in the tracker.
 	double targetE; //total energy deposition in the target.
 };

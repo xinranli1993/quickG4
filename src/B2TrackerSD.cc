@@ -76,8 +76,8 @@ G4bool B2TrackerSD::ProcessHits(G4Step* aStep,
   // energy deposit
   G4double edep = aStep->GetTotalEnergyDeposit();
 
-  if (edep==0. && aStep->GetPreStepPoint()->GetPhysicalVolume()->GetName()!="Target") return false;
-  if(aStep->GetPreStepPoint()->GetPhysicalVolume()->GetName()=="Target"){
+  //if (edep==0. && aStep->GetPreStepPoint()->GetPhysicalVolume()->GetName()!="Target") return false;
+  if(aStep->GetPreStepPoint()->GetPhysicalVolume()->GetName()=="CPD"){
 	 // G4cout<<"recorded hits "<<fHitsCollection->GetSize()<<G4endl;
 	  B2TrackerHit* newHit;
 	  if(fHitsCollection->GetSize()==0){
@@ -105,7 +105,7 @@ G4bool B2TrackerSD::ProcessHits(G4Step* aStep,
 		  if(aStep->GetTrack()->GetTrackID()==hit->GetTrackID())
 			  hit->SetPos (aStep->GetPostStepPoint()->GetPosition());
 		  G4double distance = (aStep->GetPostStepPoint()->GetPosition() - hit->GetPos()).mag();
-		  if(distance < 0.2*cm){
+		  if(distance < 0.2*mm){
 			hit->SetEdep(hit->GetEdep()+edep);
 		  }
 	//	  hit->Print();

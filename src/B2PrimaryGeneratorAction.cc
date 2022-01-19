@@ -39,6 +39,7 @@
 #include "G4SystemOfUnits.hh"
 
 #include "Randomize.hh"
+#include "G4RandomDirection.hh"
 
 //....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo......
 
@@ -51,7 +52,7 @@ B2PrimaryGeneratorAction::B2PrimaryGeneratorAction()
   // default particle kinematic
 
   G4ParticleDefinition* particleDefinition 
-    = G4ParticleTable::GetParticleTable()->FindParticle("proton");
+    = G4ParticleTable::GetParticleTable()->FindParticle("gamma");
 
   fParticleGun->SetParticleDefinition(particleDefinition);
   fParticleGun->SetParticleMomentumDirection(G4ThreeVector(1.,0.,0.));
@@ -87,7 +88,14 @@ void B2PrimaryGeneratorAction::GeneratePrimaries(G4Event* anEvent)
     G4cerr << "The gun will be place in the center." << G4endl;
   }
 
-  fParticleGun->SetParticlePosition(G4ThreeVector(-25.*cm, 0., 0.));
+  G4double x=10, y=10;
+  while(x*x+y*y>16){
+	  x = (G4UniformRand()-0.5)*8;
+	  y = (G4UniformRand()-0.5)*8;
+  }
+
+  fParticleGun->SetParticlePosition(G4ThreeVector(27.5*mm + x*mm, y*mm, 13.75));
+  fParticleGun->SetParticleMomentumDirection(G4RandomDirection());
 
   fParticleGun->GeneratePrimaryVertex(anEvent);
 }
