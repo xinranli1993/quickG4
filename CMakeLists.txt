@@ -4,9 +4,9 @@
 #
 cmake_minimum_required(VERSION 2.6 FATAL_ERROR)
 project(B2a)
-include(FindROOT.cmake)
+#include(FindROOT.cmake)
 
-set(CMAKE_CXX_STANDARD 17)
+#set(CMAKE_CXX_STANDARD 17)
 
 #----------------------------------------------------------------------------
 # Find Geant4 package, activating all available UI and Vis drivers by default
@@ -21,11 +21,17 @@ else()
 endif()
 
 #----------------------------------------------------------------------------
+# Find ROOT package
+#
+find_package(ROOT REQUIRED)
+
+#----------------------------------------------------------------------------
 # Setup Geant4 include directories and compile definitions
 # Setup include directory for this project
 #
 include(${Geant4_USE_FILE})
-include_directories(${PROJECT_SOURCE_DIR}/include ${ROOT_INCLUDE_DIR})
+include(${ROOT_USE_FILE})
+include_directories(${PROJECT_SOURCE_DIR}/include)
 
 #----------------------------------------------------------------------------
 # Locate sources and headers for this project
