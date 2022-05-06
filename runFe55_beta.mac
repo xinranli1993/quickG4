@@ -1,0 +1,12 @@
+# Macro file for example B2
+# 
+# To be run preferably in batch, without graphics:
+# % exampleB2[a,b] run2.mac
+#
+#/run/numberOfWorkers 4
+/run/initialize
+/gun/particle gamma
+#/gun/energy 5.89 keV
+#/run/beamOn 10000000
+/gun/energy 6.49 keV
+/run/beamOn 1178000
