@@ -23,63 +23,43 @@
 // * acceptance of all terms of the Geant4 Software license.          *
 // ********************************************************************
 //
-//
-/// \file B2EventAction.cc
-/// \brief Implementation of the B2EventAction class
+// $Id: B2SteppingAction.hh 68058 2013-03-13 14:47:43Z gcosmo $
+// 
+/// \file B2SteppingAction.hh
+/// \brief Definition of the B2SteppingAction class
 
-#include "B2EventAction.hh"
-#include "B2EventData.hh"
+#ifndef B2SteppingAction_h
+#define B2SteppingAction_h 1
 
-#include "G4Event.hh"
-#include "G4EventManager.hh"
-#include "G4TrajectoryContainer.hh"
-#include "G4Trajectory.hh"
-#include "G4ios.hh"
-#include "DataIO.hh"
+#include "G4UserSteppingAction.hh"
 
-//....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo......
+class B2DetectorConstruction;
+class B2EventAction;
 
-B2EventAction::B2EventAction()
-: G4UserEventAction()
-{}
+/// Stepping action class.
+///
+/// In UserSteppingAction() there are collected the energy deposit and track 
+/// lengths of charged particles in Absober and Gap layers and
+/// updated in B2EventAction.
 
-//....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo......
-
-B2EventAction::~B2EventAction()
-{}
-
-//....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo......
-
-void B2EventAction::BeginOfEventAction(const G4Event*)
-{}
-
-//....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo......
-
-void B2EventAction::EndOfEventAction(const G4Event* event)
+class B2SteppingAction : public G4UserSteppingAction
 {
-  //// get number of stored trajectories
+public:
+//  B2SteppingAction(const B2DetectorConstruction* detectorConstruction);
+  B2SteppingAction();//const B2DetectorConstruction* detectorConstruction);
+                   // B2EventAction* eventAction);
+  virtual ~B2SteppingAction();
 
-  //G4TrajectoryContainer* trajectoryContainer = event->GetTrajectoryContainer();
-  //G4int n_trajectories = 0;
-  //if (trajectoryContainer) n_trajectories = trajectoryContainer->entries();
-
-  //// periodic printing
-
-  //G4int eventID = event->GetEventID();
-  //if ( eventID < 100 || eventID % 100 == 0) {
-  //  G4cout << ">>> Event: " << eventID  << G4endl;
-  //  if ( trajectoryContainer ) {
-  //    G4cout << "    " << n_trajectories
-  //           << " trajectories stored in this event." << G4endl;
-  //  }
-  //  G4VHitsCollection* hc = event->GetHCofThisEvent()->GetHC(0);
-  //  G4cout << "    "  
-  //         << hc->GetSize() << " hits stored in this event" << G4endl;
-  //}
-	B2EventData::Get()->SetEventID(event->GetEventID());
-	DataIO::Get()->FillTTree( B2EventData::Get());
-	B2EventData::Get()->ClearAll();
-//	G4cout<<"event done"<<G4endl;
-}  
+  virtual void UserSteppingAction(const G4Step* step);
+    
+private:
+  //const B2DetectorConstruction* fDetConstruction;
+  //const B2DetectorConstruction* fDetConstruction;
+  int trackID;
+  int secondaryID;
+//  B2EventAction*  fEventAction;  
+};
 
 //....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo......
+
+#endif

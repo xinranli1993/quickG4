@@ -7,6 +7,7 @@
 #include "G4Event.hh"
 #include "TTree.h"
 #include "TFile.h"
+#include "B2EventData.hh"
 //#include "B2TrackerHit.hh"
 
 using namespace std;
@@ -31,8 +32,8 @@ class DataIO {
 		void OpenRootFile();
 		void WriteRootFile();
 		void CloseRootFile();
-		void FillTTree(const G4Event* event);
-		void IncEventID(){fmyEvent.eventID++;};
+		void FillTTree(B2EventData* eventData);
+	//	void IncEventID(){fmyEvent.eventID++;};
 
 	private:
 		static DataIO* me;

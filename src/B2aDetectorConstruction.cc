@@ -44,6 +44,7 @@
 #include "G4AutoDelete.hh"
 #include "G4Sphere.hh"
 #include "G4RotationMatrix.hh"
+#include "G4SubtractionSolid.hh"
 
 #include "G4GeometryTolerance.hh"
 #include "G4GeometryManager.hh"
@@ -102,8 +103,6 @@ void B2aDetectorConstruction::DefineMaterials()
 
   nistManager = G4NistManager::Instance();
 
-  // Air defined using NIST Manager
-  nistManager->FindOrBuildMaterial("G4_AIR");
   
   // LHe defined using NIST Manager
   fTargetLHeMaterial  = nistManager->BuildMaterialWithNewDensity("G4_LHe", "G4_He", 0.125*g/cm3, 2*kelvin);
@@ -138,7 +137,8 @@ void B2aDetectorConstruction::DefineMaterials()
 
 G4VPhysicalVolume* B2aDetectorConstruction::DefineVolumes()
 {
-  G4Material* air  = G4Material::GetMaterial("G4_AIR");
+  G4Material* vacuum  = new G4Material("Vacuum", 7., 14.*g/mole, 1.e-20*g/cm3, kStateGas, 0.1*kelvin, 3.e-18*pascal);
+  
 
   // Sizes of the principal geometrical components (solids)
   
@@ -171,7 +171,7 @@ G4VPhysicalVolume* B2aDetectorConstruction::DefineVolumes()
   G4LogicalVolume* worldLV
     = new G4LogicalVolume(
                  worldS,   //its solid
-                 air,      //its material
+                 vacuum,      //its material
                  "World"); //its name
   
   //  Must place the World Physical volume unrotated at (0,0,0).
@@ -262,6 +262,25 @@ DilutionChamber_LV->SetVisAttributes(G4VisAttributes(G4Colour(1.,0.5,0.)));
                     false,           // no boolean operations
                     0,               // copy number
                     fCheckOverlaps); // checking overlaps 
+  //LHe
+  G4double LHeThickness = 27*mm;
+  if(LHeThickness!=0){
+    G4Tubs* SLHeS
+    = new G4Tubs("SLHeS",0,30*mm,LHeThickness/2., 0.*deg, 360.*deg);
+  G4LogicalVolume* SLHeLV
+    = new G4LogicalVolume(SLHeS, fTargetLHeMaterial
+    , "SLHeLV",0,0,0);  
+  new G4PVPlacement(0,               // no rotation
+                    G4ThreeVector(0,0,-13.75*mm+0.075*mm+LHeThickness/2), // at (x,y,z)
+                    SLHeLV,       // its logical volume
+                    "SLHe",       // its name
+                    worldLV,         // its mother  volume
+                    false,           // no boolean operations
+                    0,               // copy number
+                    fCheckOverlaps); // checking overlaps 
+  }
+
+
   //detector
 	G4Tubs* CPDS
     = new G4Tubs("CPDS",0,30*mm,0.5*mm, 0.*deg, 360.*deg);
@@ -276,12 +295,12 @@ DilutionChamber_LV->SetVisAttributes(G4VisAttributes(G4Colour(1.,0.5,0.)));
                     false,           // no boolean operations
                     0,               // copy number
                     fCheckOverlaps); // checking overlaps 
-  //source
+  //source, at the top edge of the chamber
    G4Tubs* sourceS
     = new G4Tubs("sourceS",0,10*mm,0.325*mm, 0.*deg, 360.*deg);
   G4LogicalVolume* sourceLV
     = new G4LogicalVolume(sourceS, nistManager->FindOrBuildMaterial("G4_Cu")
-	, "sourceLV",0,0,0);  
+    , "sourceLV",0,0,0);  
   new G4PVPlacement(0,               // no rotation
                     G4ThreeVector(30*mm,0,(13.75+0.325)*mm), // at (x,y,z)
                     sourceLV,       // its logical volume
@@ -290,9 +309,64 @@ DilutionChamber_LV->SetVisAttributes(G4VisAttributes(G4Colour(1.,0.5,0.)));
                     false,           // no boolean operations
                     0,               // copy number
                     fCheckOverlaps); // checking overlaps 
+
+//  //source, at the bottom corner
+//   G4Tubs* sourceS
+//    = new G4Tubs("sourceS",0,5*mm,0.325*mm, 0.*deg, 360.*deg);
+//  G4LogicalVolume* sourceLV
+//    = new G4LogicalVolume(sourceS, nistManager->FindOrBuildMaterial("G4_Cu")
+//    , "sourceLV",0,0,0);  
+//    G4RotationMatrix* rm = new G4RotationMatrix(); 
+//    rm->rotateY(-10.*deg);
+//  new G4PVPlacement(rm,               // no rotation
+//                    G4ThreeVector(30*mm-5,0,-LHeThickness/2+2*mm), // at (x,y,z)
+//                    sourceLV,       // its logical volume
+//                    "source",       // its name
+//                    SLHeLV,         // its mother  volume
+//                    false,           // no boolean operations
+//                    0,               // copy number
+//                    fCheckOverlaps); // checking overlaps 
+
+//  //// source with pocket tape
+//   G4Box* sourceS
+//    = new G4Box("sourceS",2.5*mm,2.5*mm,0.325*mm);
+//  G4LogicalVolume* sourceLV
+//    = new G4LogicalVolume(sourceS, nistManager->FindOrBuildMaterial("G4_Cu")
+//    , "sourceLV",0,0,0);  
+//    G4RotationMatrix* rm = new G4RotationMatrix(); 
+//    rm->rotateY(90.*deg);
+//  new G4PVPlacement(rm,               // no rotation
+//                    G4ThreeVector(30*mm-5*mm,0,13.75*mm-2.5*mm), // at (x,y,z)
+//                    sourceLV,       // its logical volume
+//                    "source",       // its name
+//                    worldLV,         // its mother  volume
+//                    false,           // no boolean operations
+//                    0,               // copy number
+//                    fCheckOverlaps); // checking overlaps 
+//   G4Box* AlPocketS = new G4Box("pocketAl",3.75*mm/2,5*mm,3.75*mm/2);
+//   G4Box* PocketS = new G4Box("pocketS",3.75*mm/2,5*mm,3.75*mm/2);
+//   G4VSolid* subtract = new G4SubtractionSolid("subPocket",AlPocketS, PocketS, 0, G4ThreeVector(-0.1*mm, 0.1*mm, 0.1*mm));
+//  G4LogicalVolume* pocketLV
+//    = new G4LogicalVolume(subtract, nistManager->FindOrBuildMaterial("G4_Al")
+//    , "pocketLV",0,0,0);  
+//    G4RotationMatrix* rm2 = new G4RotationMatrix(); 
+//    rm2->rotateY(45.*deg);
+//	new G4PVPlacement(rm2,
+//					  G4ThreeVector(30*mm-5*mm+0.325*mm, 2.4*mm, 13.75-2.5*mm),
+//					  pocketLV,
+//					  "pocket",
+//					  worldLV,
+//					  false,
+//					  0,
+//					  fCheckOverlaps);
+
+
+
   //limit steps
-  G4UserLimits* steplimit = new G4UserLimits(1*um);
+  G4UserLimits* steplimit = new G4UserLimits(0.01*um);
   AlFilmLV->SetUserLimits(steplimit);
+  CPDLV->SetUserLimits(steplimit);
+  DilutionChamber_LV->SetUserLimits(steplimit);
   
 
 
@@ -303,26 +377,26 @@ DilutionChamber_LV->SetVisAttributes(G4VisAttributes(G4Colour(1.,0.5,0.)));
  
 void B2aDetectorConstruction::ConstructSDandField()
 {
-  // Sensitive detectors
-
-  G4String trackerChamberSDname = "B2/TrackerChamberSD";
-  B2TrackerSD* aTrackerSD = new B2TrackerSD(trackerChamberSDname,
-                                            "TrackerHitsCollection");
-  G4SDManager::GetSDMpointer()->AddNewDetector(aTrackerSD);
-  // Setting aTrackerSD to all logical volumes with the same name 
-  // of "Chamber_LV".
-  SetSensitiveDetector("CPDLV", aTrackerSD);
-  //SetSensitiveDetector("Target_LV", aTrackerSD);
-
-  // Create global magnetic field messenger.
-  // Uniform magnetic field is then created automatically if
-  // the field value is not zero.
-  G4ThreeVector fieldValue = G4ThreeVector();
-  fMagFieldMessenger = new G4GlobalMagFieldMessenger(fieldValue);
-  fMagFieldMessenger->SetVerboseLevel(1);
-  
-  // Register the field messenger for deleting
-  G4AutoDelete::Register(fMagFieldMessenger);
+//  // Sensitive detectors
+//
+//  G4String trackerChamberSDname = "B2/TrackerChamberSD";
+//  B2TrackerSD* aTrackerSD = new B2TrackerSD(trackerChamberSDname,
+//                                            "TrackerHitsCollection");
+//  G4SDManager::GetSDMpointer()->AddNewDetector(aTrackerSD);
+//  // Setting aTrackerSD to all logical volumes with the same name 
+//  // of "Chamber_LV".
+//  SetSensitiveDetector("CPDLV", aTrackerSD);
+//  //SetSensitiveDetector("Target_LV", aTrackerSD);
+//
+//  // Create global magnetic field messenger.
+//  // Uniform magnetic field is then created automatically if
+//  // the field value is not zero.
+//  G4ThreeVector fieldValue = G4ThreeVector();
+//  fMagFieldMessenger = new G4GlobalMagFieldMessenger(fieldValue);
+//  fMagFieldMessenger->SetVerboseLevel(1);
+//  
+//  // Register the field messenger for deleting
+//  G4AutoDelete::Register(fMagFieldMessenger);
 }
 
 //....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo......

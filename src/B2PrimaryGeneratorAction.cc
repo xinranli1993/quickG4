@@ -28,6 +28,7 @@
 /// \brief Implementation of the B2PrimaryGeneratorAction class
 
 #include "B2PrimaryGeneratorAction.hh"
+#include "TMath.h"
 
 #include "G4LogicalVolumeStore.hh"
 #include "G4LogicalVolume.hh"
@@ -88,14 +89,32 @@ void B2PrimaryGeneratorAction::GeneratePrimaries(G4Event* anEvent)
     G4cerr << "The gun will be place in the center." << G4endl;
   }
 
+  // source at the top edge facing down
   G4double x=10, y=10;
   while(x*x+y*y>16){
-	  x = (G4UniformRand()-0.5)*8;
-	  y = (G4UniformRand()-0.5)*8;
+      x = (G4UniformRand()-0.5)*8;
+      y = (G4UniformRand()-0.5)*8;
   }
 
-  fParticleGun->SetParticlePosition(G4ThreeVector(27.5*mm + x*mm, y*mm, 13.75));
+  fParticleGun->SetParticlePosition(G4ThreeVector(27.5*mm + x*mm, y*mm, 13.75*mm));
   fParticleGun->SetParticleMomentumDirection(G4RandomDirection());
+
+  //// source at the bottom corner
+  //G4double x=10, y=10;
+  //while(x*x+y*y>16){
+  //    x = (G4UniformRand()-0.5)*8;
+  //    y = (G4UniformRand()-0.5)*8;
+  //}
+
+  //fParticleGun->SetParticlePosition(G4ThreeVector(25.*mm + x*mm*TMath::Cos(3.1415926/18.), y*mm, (-13.75+0.075+2-0.325*TMath::Sqrt(2.) - x*TMath::Sin(3.1415926/18.))*mm ));
+  //fParticleGun->SetParticleMomentumDirection(G4RandomDirection());
+//  // source with pocket
+//  G4double y=0, z=0;
+//      y = (G4UniformRand()-0.5)*3;
+//      z = (G4UniformRand()-0.5)*4;
+//
+//  fParticleGun->SetParticlePosition(G4ThreeVector(25*mm+0.325*mm, y*mm-0.15*mm, (13.75-2.5+z)*mm ));
+//  fParticleGun->SetParticleMomentumDirection(G4RandomDirection());
 
   fParticleGun->GeneratePrimaryVertex(anEvent);
 }
